@@ -31,14 +31,11 @@ class page_checker:
 
     def api_call_for_link_change(self, db_id, url, new_content, timer):
         data = {
-            'id' : db_id,
             'url' : url,
             'content' : new_content,
             'next_check' : timer
         }
         res = requests.post(API, data=data)
-        print(res)
-        input()
 
     def produce_kafka(self, topic):
         kafka_produce

@@ -4,6 +4,7 @@ from .models import Link
 from links_app.serializers import LinkSerializer
 
 from datetime import datetime
+import json
 
 class LinkViewSet(viewsets.ModelViewSet):
     serializer_class = LinkSerializer
@@ -26,8 +27,11 @@ class LinkProcessorViewSet(viewsets.ModelViewSet):
         return [link for link in links if (link.id % total_shards == shard)]
 
     def perform_create(self, serializer):
-        print(serializer.data)
-        print("ok", serializer, Link.objects.filter(id=self.request.GET.get('id')))
-        input()
-        if(len(Link.objects.filter(id=self.request.GET.get('id'))) == 0):
+        link = Link.objects.get(url=serializer.data.get('url'))
+        if(link == None):
             return super().perform_create(serializer)
+        else:
+            link.content = serializer.data.get('content')
+            link.next_check = serializer.data.get('next_check')
+            link.save()
+            return
