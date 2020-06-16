@@ -7,5 +7,4 @@ class preprocess:
 
     def soup_call(self, text: str) -> str:
         soup = BeautifulSoup(text, features="html.parser")
-        print(" ".join(soup.get_text().split()))
         return " ".join(soup.get_text().split())
