@@ -5,4 +5,4 @@ class LinkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Link
-        fields = ['id', 'url', 'content', 'is_multi_page', 'page_id', 'next_check']
+        fields = ['id', 'url', 'content', 'is_multi_page', 'page_id', 'next_check', 'penalty']

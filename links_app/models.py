@@ -13,3 +13,4 @@ class Link(models.Model):
     is_multi_page = models.BooleanField()
     page_id = models.CharField(max_length=50, null=True)
     next_check = models.FloatField(default=0)
+    penalty = models.FloatField(default=10)

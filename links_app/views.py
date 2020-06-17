@@ -27,11 +27,11 @@ class LinkProcessorViewSet(viewsets.ModelViewSet):
         return [link for link in links if (link.id % total_shards == shard)]
 
     def perform_create(self, serializer):
-        link = Link.objects.get(url=serializer.data.get('url'))
-        if(link == None):
-            return super().perform_create(serializer)
-        else:
+        try: 
+            link = Link.objects.get(url=serializer.validated_data.get('url'))
             link.content = serializer.data.get('content')
             link.next_check = serializer.data.get('next_check')
+            link.penalty = serializer.data.get('penalty')
             link.save()
-            return
+        except:
+            super().perform_create(serializer)
