@@ -1,0 +1,40 @@
+<style>
+    .center {
+      margin: auto;
+      width: 60%;
+    }
+  </style>
+
+    <div class="panel panel-primary center">
+      <div class="panel-heading">Add new link to watch</div>
+      <div class="panel-body">
+        <input id="link" class="col-5" type="text" name="link"
+          placeholder="Link to watch...">
+        <br>
+        <input id="has_pages" type="checkbox" class="form-check-input">
+        <label class="form-check-label" for="exampleCheck1">Group of pages?</label>
+        <input id="pages" class="col-5" type="text" name="pages"
+          placeholder="Page counter identifier...">
+        <br>
+        <br>
+        <div style="text-align: center;">
+          <button type="submit" class="btn btn-primary" (click)="postLink()">Add</button>
+        </div>
+      </div>
+    </div>
+
+  <br>
+  <br>
+  <div class="panel panel-primary center">
+    <div class="panel-heading">My watch links</div>
+    <div class="panel-body">
+      <table style="border: 1px solid black; width: 100%;">
+        <th style="border: 1px solid black; padding: 10px;">URL</th>
+        <th style="border: 1px solid black; padding: 10px;">Version</th>
+        <tr *ngFor="let link of links" style="border: 1px solid black">
+          <td style="border: 1px solid black; padding: 10px;">{{link.url}}</td>
+          <td style="border: 1px solid black; padding: 10px;">{{link.version}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>

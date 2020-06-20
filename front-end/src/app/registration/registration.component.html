@@ -1,0 +1,34 @@
+<div class="card">
+    <form [formGroup]="myform" (ngSubmit)="onSubmit(myform.value)">
+    <div class="form-group ">
+        <label class="col-sm-2 control-label ">
+            Username
+        </label>
+        <div class="col-sm-10">
+            <div *ngIf='!valid'> <h5 style="color: red" >Username already exists.</h5></div>
+            <input name="username" class="form-control" formControlName='username' type="text" value="">
+            <span class="help-block">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</span>
+        </div>
+    </div>
+    <div class="form-group ">
+        <label class="col-sm-2 control-label ">
+            Password
+        </label>
+        <div class="col-sm-10">
+            <input  formControlName='password' name="password" class="form-control" type="password" value="">
+        </div>
+    </div>
+    <div class="form-group ">
+    
+        <label class="col-sm-2 control-label ">
+            Email address
+        </label>
+    
+    
+        <div class="col-sm-10">
+            <input name="email"  formControlName='email' class="form-control" type="email" value="">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success block">Submit</button>
+    </form>
+    </div>

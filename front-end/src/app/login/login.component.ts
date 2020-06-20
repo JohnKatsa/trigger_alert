@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormsModule } from '@angular/forms'; 
+import { AuthenticationService } from '../authentication.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+    // moduleId: module.id.toString(),
+    templateUrl: 'login.component.html'
 })
 
 export class LoginComponent implements OnInit {
@@ -17,21 +16,29 @@ export class LoginComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private router: Router,
+        private authenticationService: AuthenticationService
     ) { }
 
     ngOnInit() {
-        this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/create';
-        
+        this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
     }
 
     login() {
         this.loading = true;
-        
+        this.authenticationService.login(this.model.username, this.model.password)
+            .subscribe(
+                data => { 
+                    this.router.navigate([this.returnUrl]); 
+                    let id : number = +localStorage.getItem('id');
+                }
+            );
     }
 
-    getUser(id) {
-
+    register() {
+        this.router.navigate(['register']);
     }
+    
     logout() {
+        this.authenticationService.logout()
     }
 }
