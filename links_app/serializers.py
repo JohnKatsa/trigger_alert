@@ -16,7 +16,7 @@ class LinkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Link
-        fields = ['id', 'url', 'content', 'is_multi_page', 'page_id', 'next_check', 'penalty']
+        fields = ['id', 'url', 'content', 'is_multi_page', 'page_id', 'next_check', 'penalty', 'version']
 
 
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets, permissions, status, generics
-from .models import Link, User
+from .models import Link, User as Suser
 from links_app.serializers import LinkSerializer, UserSerializer, UserLoginSerializer, UserRegistrationSerializer
 from rest_framework.generics import RetrieveAPIView, CreateAPIView
 from rest_framework.response import Response
@@ -14,7 +14,7 @@ import json
 @api_view(['POST'])
 def validateUsername(request):
     username = request.data['username']
-    if User.objects.filter(username=username).count() > 0:
+    if Suser.objects.filter(username=username).count() > 0:
         return HttpResponse(False)
     return HttpResponse(True)
 
@@ -35,6 +35,7 @@ class LinkProcessorViewSet(viewsets.ModelViewSet):
             link.content = serializer.data.get('content')
             link.next_check = serializer.data.get('next_check')
             link.penalty = serializer.data.get('penalty')
+            link.version = serializer.data.get('version')
             link.save()
         except:
             super().perform_create(serializer)
@@ -43,7 +44,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = Suser.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
 
 class UserLoginView(RetrieveAPIView):
@@ -99,9 +100,22 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 class LinkViewSet(viewsets.ModelViewSet):
     serializer_class = LinkSerializer
-    queryset = Link.objects.all()
-    #permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
-    # def get_queryset(self):
-    #     #user = User.objects.filter(id=self.request.user)
-    #     return Link.objects.all()
+    def get_queryset(self):
+        uId = int(self.request.GET['u_id'])
+        user = Suser.objects.get(id=uId)
+        return [link for link in Link.objects.all() if user in link.users.all()]
+
+    def perform_create(self, serializer):
+        u_id = self.request.GET['u_id']
+        try: 
+            link = Link.objects.get(url=serializer.validated_data.get('url'))
+        except:
+            link = Link(url=serializer.data.get('url'),
+                        is_multi_page=serializer.data.get('is_multi_page'),
+                        page_id=serializer.data.get('page_id'))
+            link.save()
+            user = Suser.objects.get(id=u_id)
+            link.users.add(user)
+            link.save()
+            
