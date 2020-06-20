@@ -5,7 +5,7 @@ class download:
         text = ""
         
         if(is_multi_page):
-            for i in range(3):
+            for i in range(1, 4):
                 text += " " + requests.get(url + str(i)).text
         else:
             text = requests.get(url).text

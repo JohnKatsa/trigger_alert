@@ -6,6 +6,7 @@ import diff_checker as dc
 import requests, json, datetime
 
 from kafka import KafkaProducer
+from kafka.admin import KafkaAdminClient, NewTopic
 
 THRESHOLD = 1
 INTERVAL = 1
@@ -18,6 +19,7 @@ class page_checker:
         self.downloader = dow.download()
         self.diff_checker = dc.diff_checker()
         self.contents = []
+        self.admin_client = KafkaAdminClient(bootstrap_servers="localhost:9092", client_id='test')
 
     # downloads and preprocesses
     def get(self, url) -> str:
@@ -43,9 +45,14 @@ class page_checker:
         }
         res = requests.post(API, data=data)
 
-    def produce_kafka(self, topic):
-        producer = KafkaProducer(bootstrap_servers='localhost:1234')
-        producer.send(topic, 'Page ' + topic + " changed.")
+    def produce_kafka(self, topic, url):
+        producer = KafkaProducer(bootstrap_servers=['localhost:9092'], value_serializer=lambda x: json.dumps(x).encode('utf-8'))
+        try:
+            topic_list = [NewTopic(name=topic, num_partitions=1, replication_factor=1)]
+            self.admin_client.create_topics(new_topics=topic_list)
+        except:
+            pass
+        producer.send(topic, json.dumps({'id' : topic, 'url' : url}))
 
     def get_timer(self, url):
         for item in self.contents:
@@ -73,7 +80,7 @@ class page_checker:
 
     def notify(self, db_id, has_changed, old_content, new_content, url, old_timer, penalty):
         if(has_changed):
-            self.produce_kafka(url)
+            self.produce_kafka(str(db_id), url)
         timer, penalty = self.update_url_timer(has_changed, old_timer, penalty)
         self.api_call_for_link_change(db_id, url, new_content, timer, penalty)
 

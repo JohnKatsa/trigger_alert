@@ -7,7 +7,7 @@ class User(AbstractUser):
     email = models.EmailField(null=True)
 
 class Link(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    users = models.ManyToManyField(User)
     url = models.CharField(max_length=200, null=True)
     content = models.TextField(default='')
     is_multi_page = models.BooleanField()
