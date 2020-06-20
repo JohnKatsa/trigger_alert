@@ -5,9 +5,6 @@ import download as dow
 import diff_checker as dc
 import requests, json, datetime
 
-from kafka import KafkaProducer
-from kafka.admin import KafkaAdminClient, NewTopic
-
 THRESHOLD = 1
 INTERVAL = 1
 WEIGHT = 0.1
@@ -19,7 +16,6 @@ class page_checker:
         self.downloader = dow.download()
         self.diff_checker = dc.diff_checker()
         self.contents = []
-        self.admin_client = KafkaAdminClient(bootstrap_servers="localhost:9092", client_id='test')
 
     # downloads and preprocesses
     def get(self, url) -> str:
@@ -35,7 +31,7 @@ class page_checker:
     def api_call_for_contents(self, my_instance, all_instances):
         self.contents = json.loads(requests.get(API + '?page_checker_id={}&page_checkers={}'.format(my_instance, all_instances)).text)
 
-    def api_call_for_link_change(self, db_id, url, new_content, timer, penalty):
+    def api_call_for_link_change(self, db_id, url, new_content, timer, penalty, has_changed, version):
         data = {
             'id' : db_id,
             'url' : url,
@@ -43,16 +39,11 @@ class page_checker:
             'next_check' : timer,
             'penalty' : penalty,
         }
+        if has_changed:
+            data['version'] = version+1
+        else:
+            data['version'] = version
         res = requests.post(API, data=data)
-
-    def produce_kafka(self, topic, url):
-        producer = KafkaProducer(bootstrap_servers=['localhost:9092'], value_serializer=lambda x: json.dumps(x).encode('utf-8'))
-        try:
-            topic_list = [NewTopic(name=topic, num_partitions=1, replication_factor=1)]
-            self.admin_client.create_topics(new_topics=topic_list)
-        except:
-            pass
-        producer.send(topic, json.dumps({'id' : topic, 'url' : url}))
 
     def get_timer(self, url):
         for item in self.contents:
@@ -68,21 +59,20 @@ class page_checker:
 
             for content in self.contents:
                 url = content['url']
+                version = int(content['version'])
                 old_content = content['content']
                 new_content = self.get(url)
                 penalty = float(content['penalty'])
 
-                self.notify(content['id'], self.check(old_content, new_content), old_content, new_content, url, self.get_timer(url), penalty)
+                self.notify(content['id'], self.check(old_content, new_content), old_content, new_content, url, self.get_timer(url), penalty, version)
 
 
     def check(self, old_content, new_content: str) -> bool:
         return self.diff_checker.cosine(self.diff_checker.tf_idf(old_content, new_content)) < THRESHOLD
 
-    def notify(self, db_id, has_changed, old_content, new_content, url, old_timer, penalty):
-        if(has_changed):
-            self.produce_kafka(str(db_id), url)
+    def notify(self, db_id, has_changed, old_content, new_content, url, old_timer, penalty, version):
         timer, penalty = self.update_url_timer(has_changed, old_timer, penalty)
-        self.api_call_for_link_change(db_id, url, new_content, timer, penalty)
+        self.api_call_for_link_change(db_id, url, new_content, timer, penalty, has_changed, version)
 
 
 if __name__ == "__main__":
