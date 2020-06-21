@@ -37,7 +37,9 @@ export class RegistrationComponent implements OnInit {
     console.log(user);
     this.userService.validateUsername(user.username).subscribe(data => {
       if (data == 'True'){
-        this.userService.createUser(user).subscribe();
+        this.userService.createUser(user).subscribe(d => {
+          console.log(d)
+        });
         this.valid = true;
         return this.router.navigate(['login/']);
       }

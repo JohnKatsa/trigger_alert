@@ -25,7 +25,7 @@ export class UserDataService {
   createUser(user): Observable<any> {
     //return this.http.post(this.api+'users/',user,this.httpOptions);
     console.log(user)
-    return this.http.post(this.api+'signup/',user,this.httpOptions);
+    return this.http.post(this.api+'signup/', user, this.httpOptions);
   }
 
   validateUsername(username) : Observable<any> {

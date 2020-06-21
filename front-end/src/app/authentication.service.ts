@@ -31,9 +31,10 @@ export class AuthenticationService {
             }));        
     }
 
-    logout() {
+    logout(): void {
         // remove token from local storage to log user out
         localStorage.removeItem('token');
         localStorage.removeItem('username');
+        console.log("ok")
     }
 }

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserDataService } from '../user-data.service';
+import { AuthenticationService } from '../authentication.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +13,9 @@ export class HomeComponent implements OnInit {
   model : any = {}
   links;
 
-  constructor(private userService : UserDataService) { }
+  constructor(private userService : UserDataService,
+              private authenticationService : AuthenticationService,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.getLinks()
@@ -40,6 +44,11 @@ export class HomeComponent implements OnInit {
     this.userService.postLink(data).subscribe(data => {
       console.log(data)
     })
+  }
+
+  signout(): void {
+    this.authenticationService.logout();
+    this.router.navigate(['login/']);
   }
 
 }
