@@ -18,8 +18,8 @@ class page_checker:
         self.contents = []
 
     # downloads and preprocesses
-    def get(self, url) -> str:
-        return self.preprocessor.preprocess_page(self.downloader.download_page(url))
+    def get(self, url, page_id) -> str:
+        return self.preprocessor.preprocess_page(self.downloader.download_page(url, page_id))
 
     def update_url_timer(self, has_changed, timer, penalty):
         if(timer == 0):
@@ -57,11 +57,14 @@ class page_checker:
             # get urls
             self.api_call_for_contents(my_instance, all_instances)
 
+            print([c['url'] for c in self.contents])
+
             for content in self.contents:
                 url = content['url']
                 version = int(content['version'])
                 old_content = content['content']
-                new_content = self.get(url)
+                page_id = content['page_id']
+                new_content = self.get(url, page_id)
                 penalty = float(content['penalty'])
 
                 self.notify(content['id'], self.check(old_content, new_content), old_content, new_content, url, self.get_timer(url), penalty, version)
