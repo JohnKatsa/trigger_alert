@@ -42,8 +42,11 @@ export class HomeComponent implements OnInit {
     console.log(data)
 
     this.userService.postLink(data).subscribe(data => {
-      console.log(data)
-    })
+      console.log(data);
+      this.getLinks();
+    });
+
+    (document.getElementById("link") as HTMLInputElement).value = ""
   }
 
   signout(): void {
