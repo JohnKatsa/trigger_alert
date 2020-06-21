@@ -71,8 +71,10 @@ class UserRegistrationView(CreateAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
+        for item in request.POST.items():
+            print(item)
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        print(serializer.is_valid(raise_exception=True))
         serializer.save()
         status_code = status.HTTP_201_CREATED
         response = {
